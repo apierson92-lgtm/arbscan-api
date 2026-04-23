@@ -1,11 +1,7 @@
-const express = require("express");
-const cors = require("cors");
 const fetch = require("node-fetch");
 
-const app = express();
-app.use(cors());
-
-app.get("/markets", async (req, res) => {
+module.exports = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
   try {
     const [kalshiRes, polyRes] = await Promise.all([
       fetch("https://api.elections.kalshi.com/trade-api/v2/markets?limit=100&status=open"),
@@ -32,7 +28,5 @@ app.get("/markets", async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-});
-
-app.listen(process.env.PORT || 3000, () => console.log("Running!"));
+};
 
