@@ -8,7 +8,7 @@ app.use(cors());
 app.get("/markets", async (req, res) => {
   try {
     const [kalshiRes, polyRes] = await Promise.all([
-      fetch("https://trading-api.kalshi.com/trade-api/v2/markets?limit=100&status=open"),
+      fetch("https://api.elections.kalshi.com/trade-api/v2/markets?limit=100&status=open"),
       fetch("https://clob.polymarket.com/markets?limit=100"),
     ]);
 
@@ -34,5 +34,5 @@ app.get("/markets", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 3000, () => console.log("Running!"));
+app.listen(process.env.PORT || 3000, () =>
 
