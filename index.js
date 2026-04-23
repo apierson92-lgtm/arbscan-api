@@ -5,6 +5,13 @@ const fetch = require("node-fetch");
 const app = express();
 app.use(cors());
 
+const POLITICS_KEYWORDS = ["president", "election", "congress", "senate", "house", "vote", "fed", "rate", "inflation", "gdp", "recession", "unemployment", "trump", "biden", "harris", "republican", "democrat", "government", "shutdown", "debt", "ceasefire", "war", "ukraine", "russia", "china", "tariff", "trade", "supreme court", "legislation", "bill", "policy", "mayor", "governor", "prime minister"];
+
+function isPolitics(text) {
+  const t = text.toLowerCase();
+  return POLITICS_KEYWORDS.some(k => t.includes(k));
+}
+
 app.get("/markets", async (req, res) => {
   try {
     const [kalshiRes, polyRes] = await Promise.all([
@@ -18,7 +25,7 @@ app.get("/markets", async (req, res) => {
     const now = new Date();
 
     const kalshi = (kalshiData.markets || [])
-      .filter(m => m.close_time && new Date(m.close_time) > now)
+      .filter(m => m.close_time && new Date(m.close_time) > now && isPolitics(m.title || ""))
       .map(m => ({
         title: m.title,
         yes_price: m.last_price ?? m.yes_ask ?? 0.5,
@@ -27,7 +34,7 @@ app.get("/markets", async (req, res) => {
       }));
 
     const polymarket = (Array.isArray(polyData) ? polyData : [])
-      .filter(m => m.endDate && new Date(m.endDate) > now)
+      .filter(m => m.endDate && new Date(m.endDate) > now && isPolitics(m.question || ""))
       .map(m => ({
         question: m.question,
         price: parseFloat(m.outcomePrices?.[0] ?? m.bestBid ?? 0.5),
