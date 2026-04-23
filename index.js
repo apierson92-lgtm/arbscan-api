@@ -9,7 +9,7 @@ app.get("/markets", async (req, res) => {
   try {
     const [kalshiRes, polyRes] = await Promise.all([
       fetch("https://api.elections.kalshi.com/trade-api/v2/markets?limit=200&status=open"),
-      fetch("https://clob.polymarket.com/markets?limit=200"),
+      fetch("https://gamma-api.polymarket.com/markets?closed=false&limit=200"),
     ]);
 
     const kalshiData = await kalshiRes.json();
@@ -26,11 +26,11 @@ app.get("/markets", async (req, res) => {
         category: m.category,
       }));
 
-    const polymarket = (polyData.data || [])
+    const polymarket = (Array.isArray(polyData) ? polyData : [])
       .filter(m => m.end_date_iso && new Date(m.end_date_iso) > now)
       .map(m => ({
         question: m.question,
-        price: parseFloat(m.tokens?.[0]?.price ?? 0.5),
+        price: parseFloat(m.outcomePrices?.[0] ?? 0.5),
         closes: m.end_date_iso,
       }));
 
